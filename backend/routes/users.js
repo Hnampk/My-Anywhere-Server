@@ -26,20 +26,26 @@ router.get("", checkAuth, (req, res, next) => {
         });
 });
 
-router.get("/:id", (req, res, next) => {
-    User.findById(req.params.id)
-        .then(result => {
-            res.status(200).json({
-                message: "User fetch successfully",
-                user: result
+router.get("/:id",
+    // checkAuth,
+    (req, res, next) => {
+        User.findById(req.params.id)
+            .then(result => {
+                res.status(200).json({
+                    message: "User fetch successfully",
+                    user: {
+                        _id: result._id,
+                        phonenumber: result.phonenumber,
+                        address: result.address
+                    }
+                });
+            })
+            .catch(error => {
+                res.status(404).json({
+                    error: error
+                });
             });
-        })
-        .catch(error => {
-            res.status(404).json({
-                error: error
-            });
-        });
-});
+    });
 
 router.post("/sign_up", (req, res, next) => {
     const user = new User({

@@ -26,17 +26,33 @@ router.get("", checkAuth, (req, res, next) => {
         });
 });
 
-router.post("", (req, res, next) => {
+router.get("/:id", (req, res, next) => {
+    User.findById(req.params.id)
+        .then(result => {
+            res.status(200).json({
+                message: "User fetch successfully",
+                user: result
+            });
+        })
+        .catch(error => {
+            res.status(404).json({
+                error: error
+            });
+        });
+});
+
+router.post("/sign_up", (req, res, next) => {
     const user = new User({
         phonenumber: req.body.phonenumber,
-        password: req.body.password
+        password: req.body.password,
+        address: null
     });
 
     user.save()
         .then(result => {
             res.status(201).json({
                 message: "User created!",
-                result: result
+                info: result
             });
         })
         .catch(error => {
@@ -64,15 +80,25 @@ router.post("/login", (req, res, next) => {
             }
 
             console.log(user);
-            const token = jwt.sign({ phonenumber: user.phonenumber, userId: user._id }, "my_secret_key");
+            const token = jwt.sign({ phonenumber: user.phonenumber, userId: user._id }, secret);
             return res.status(200).json({
                 message: "Login Successfully!",
-                token: token
+                token: token,
+                info: user
             });
 
         }).catch(error => {
             res.status(500).json({
                 error: error
+            });
+        });
+});
+
+router.patch("/update/:id", (req, res, next) => {
+    User.updateOne({ _id: req.params.id }, req.body)
+        .then(result => {
+            res.status(201).json({
+                message: "Update succesfully!",
             });
         });
 });

@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const Post = require('./models/post');
 const mongoose = require('mongoose');
 const usersRoute = require('./routes/users');
+const circlesRoute = require('./routes/circles');
+const routesRoute = require('./routes/routes');
 const md5 = require('md5');
 
 const app = express();
@@ -22,7 +24,7 @@ app.use((req, res, next) => {
     );
     res.setHeader(
         "Access-Control-Allow-Methods",
-        "GET, POST"
+        "GET, POST, PATCH, PUT"
     );
     next();
 });
@@ -73,5 +75,7 @@ app.delete("/api/posts/:id", (req, res, next) => {
 // });
 
 app.use("/api/users", usersRoute);
+app.use("/api/circles", circlesRoute);
+app.use("/api/routes", routesRoute);
 
 module.exports = app;

@@ -31,24 +31,9 @@ const storage = multer.diskStorage({
     }
 });
 
-router.get("", checkAuth, (req, res, next) => {
-
-    const body = req.body;
-
-    User.find()
-        .then(documents => {
-            res.status(200).json({
-                message: "User fetched successfully",
-                posts: documents
-            });
-        })
-        .catch(error => {
-            res.status(404).json({
-                error: error
-            })
-        });
-});
-
+/**
+ * Get User by Id
+ */
 router.get("/:id",
     checkAuth,
     (req, res, next) => {
@@ -61,7 +46,8 @@ router.get("/:id",
                         phonenumber: result.phonenumber,
                         address: result.address,
                         name: result.name,
-                        avatar: result.avatar
+                        avatar: result.avatar,
+                        static_code: result.static_code
                     }
                 });
             })
@@ -72,6 +58,9 @@ router.get("/:id",
             });
     });
 
+/**
+ * Get User by Phonenumber
+ */
 router.get("/by_phonenumber/:phonenumber",
     checkAuth,
     (req, res, next) => {
@@ -89,7 +78,8 @@ router.get("/by_phonenumber/:phonenumber",
                         phonenumber: result.phonenumber,
                         address: result.address,
                         name: result.name,
-                        avatar: result.avatar
+                        avatar: result.avatar,
+                        static_code: result.static_code
                     }
                 });
             })
@@ -100,17 +90,53 @@ router.get("/by_phonenumber/:phonenumber",
             });
     });
 
+/**
+ * Get User by Static code
+ */
+router.get("/by_static_code/:static_code",
+    checkAuth,
+    (req, res, next) => {
+        User.findOne({ "static_code": req.params.static_code })
+            .then(result => {
+                if (!result) {
+                    throw new Error();
+                }
+
+                res.status(200).json({
+                    message: "User fetch successfully",
+                    user: {
+                        id: result._id,
+                        phonenumber: result.phonenumber,
+                        address: result.address,
+                        name: result.name,
+                        avatar: result.avatar,
+                        static_code: result.static_code
+                    }
+                });
+            })
+            .catch(error => {
+                res.status(404).json({
+                    error: "Invalid code!"
+                });
+            });
+    });
+
 router.post("/sign_up", (req, res, next) => {
     const user = new User({
         phonenumber: req.body.phonenumber,
         password: req.body.password,
         name: req.body.phonenumber,
         avatar: "https://scontent.fhan3-1.fna.fbcdn.net/v/t1.0-9/43096004_2100121983332304_5007236297182412800_o.jpg?_nc_cat=102&_nc_ht=scontent.fhan3-1.fna&oh=4deebc1b11640aa8462a8e5f1c01f945&oe=5C71603B",
-        address: null
+        address: null,
+        static_code: null
     });
+    user.static_code = user._id.toString().toLowerCase().split("").reverse().join("").substring(0, 5);
+
+    console.log(user);
 
     user.save()
         .then(result => {
+            console.log(result);
             const token = jwt.sign({ phonenumber: user.phonenumber, userId: user._id }, secret);
             res.status(201).json({
                 message: "User created!",

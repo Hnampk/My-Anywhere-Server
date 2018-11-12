@@ -9,7 +9,8 @@ const userSchema = mongoose.Schema({
     address: {
         type: { lat: Number, lng: Number, content: String },
         // default: {lat: 0, lng: 0, content: ""}
-    }
+    },
+    static_code: {type: String, required: true}
 });
 
 // throw an Error when the phonenumber already exist

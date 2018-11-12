@@ -1,11 +1,35 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
 const User = require('../models/user');
 
 const router = express.Router();
 const checkAuth = require('../middleware/check-auth');
 
 const secret = "my_secret_key";
+
+const MIME_TYPE_MAP = {
+    'image/png': 'png',
+    'image/jpeg': 'jpg',
+    'image/jpg': 'jpg'
+}
+
+const storage = multer.diskStorage({
+    destination: (req, file, callback) => {
+        const isValid = MIME_TYPE_MAP[file.mimetype];
+        let error = new Error("Invalid mime type");
+
+        if (isValid) {
+            error = null;
+        }
+        callback(error, 'backend/images');
+    },
+    filename: (req, file, callback) => {
+        const name = file.originalname.toLowerCase().split(' ').join('-');
+        const ext = MIME_TYPE_MAP[file.mimetype];
+        callback(null, name + '-' + Date.now() + '.' + ext);
+    }
+});
 
 router.get("", checkAuth, (req, res, next) => {
 
@@ -26,22 +50,52 @@ router.get("", checkAuth, (req, res, next) => {
 });
 
 router.get("/:id",
-    // checkAuth,
+    checkAuth,
     (req, res, next) => {
         User.findById(req.params.id)
             .then(result => {
                 res.status(200).json({
                     message: "User fetch successfully",
                     user: {
-                        _id: result._id,
+                        id: result._id,
                         phonenumber: result.phonenumber,
-                        address: result.address
+                        address: result.address,
+                        name: result.name,
+                        avatar: result.avatar
                     }
                 });
             })
             .catch(error => {
                 res.status(404).json({
                     error: error
+                });
+            });
+    });
+
+router.get("/by_phonenumber/:phonenumber",
+    checkAuth,
+    (req, res, next) => {
+        User.findOne({ "phonenumber": req.params.phonenumber })
+            .then(result => {
+                if (!result) {
+                    throw new Error();
+                }
+                console.log(result);
+
+                res.status(200).json({
+                    message: "User fetch successfully",
+                    user: {
+                        id: result._id,
+                        phonenumber: result.phonenumber,
+                        address: result.address,
+                        name: result.name,
+                        avatar: result.avatar
+                    }
+                });
+            })
+            .catch(error => {
+                res.status(404).json({
+                    error: "Phone number not found"
                 });
             });
     });
@@ -103,13 +157,41 @@ router.post("/login", (req, res, next) => {
         });
 });
 
-router.patch("/update/:id", (req, res, next) => {
-    User.updateOne({ _id: req.params.id }, req.body)
-        .then(result => {
-            res.status(201).json({
-                message: "Update succesfully!",
+router.patch("/update/:id",
+    [checkAuth, multer({ storage: storage }).single("image")],
+    (req, res, next) => {
+
+        let reqData = {
+            name: req.body.name,
+        }
+
+        let imagePath = "";
+        // modify avatar
+        if (req.file) {
+            const url = req.protocol + "://" + req.get("host");
+            imagePath = url + "/images/" + req.file.filename;
+
+            reqData = {
+                name: req.body.name,
+                avatar: imagePath
+            }
+        }
+
+        User.updateOne({ _id: req.params.id },
+            reqData,
+            { new: true })
+            .then(result => {
+                // console.log(result)
+                res.status(201).json({
+                    message: "Update succesfully!",
+                    imagePath: imagePath
+                });
+            })
+            .catch(error => {
+                res.status(500).json({
+                    error: error
+                });
             });
-        });
-});
+    });
 
 module.exports = router;

@@ -186,6 +186,7 @@ router.patch("/update/:id",
     [checkAuth, multer({ storage: storage }).single("image")],
     (req, res, next) => {
 
+        // modify name
         let reqData = {
             name: req.body.name,
         }
@@ -199,6 +200,12 @@ router.patch("/update/:id",
             reqData = {
                 name: req.body.name,
                 avatar: imagePath
+            }
+        }
+
+        if (req.body.address) {
+            reqData = {
+                address: req.body.address
             }
         }
 

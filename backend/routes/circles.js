@@ -37,8 +37,8 @@ router.post("/create", checkAuth, (req, res, next) => {
  * FETCH CIRCLE
  * id: Circle Id
  */
-router.get("/:id", checkAuth, (req, res, next) => {
-    Circle.findOne({ "_id": req.params.id })
+router.get("/:circle_id", checkAuth, (req, res, next) => {
+    Circle.findOne({ "_id": req.params.circle_id })
         .then(result => {
             res.status(200).json({
                 message: "Route fetch successfully!",
@@ -72,8 +72,8 @@ router.get("/by_user_id/:user_id", checkAuth, (req, res, next) => {
  * id: Circle Id
  * member doesnt exist in circle
  */
-router.patch("/add_member/:id", (req, res, next) => {
-    const circle_id = req.params.id;
+router.patch("/add_member/:circle_id", (req, res, next) => {
+    const circle_id = req.params.circle_id;
     const member_id = req.body.member_id;
 
     Circle.findOneAndUpdate({ "_id": circle_id, "members": { $ne: member_id } },

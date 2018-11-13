@@ -96,7 +96,7 @@ router.get("/by_phonenumber/:phonenumber",
 router.get("/by_static_code/:static_code",
     checkAuth,
     (req, res, next) => {
-        User.findOne({ "static_code": req.params.static_code })
+        User.find({ "static_code": req.params.static_code })
             .then(result => {
                 if (!result) {
                     throw new Error();
@@ -104,14 +104,16 @@ router.get("/by_static_code/:static_code",
 
                 res.status(200).json({
                     message: "User fetch successfully",
-                    user: {
-                        id: result._id,
-                        phonenumber: result.phonenumber,
-                        address: result.address,
-                        name: result.name,
-                        avatar: result.avatar,
-                        static_code: result.static_code
-                    }
+                    result: result.map(user => {
+                        return {
+                            _id: user._id,
+                            phonenumber: user.phonenumber,
+                            name: user.name,
+                            avatar: user.avatar,
+                            address: user.address,
+                            static_code: user.static_code
+                        }
+                    }),
                 });
             })
             .catch(error => {
@@ -132,11 +134,8 @@ router.post("/sign_up", (req, res, next) => {
     });
     user.static_code = user._id.toString().toLowerCase().split("").reverse().join("").substring(0, 5);
 
-    console.log(user);
-
     user.save()
         .then(result => {
-            console.log(result);
             const token = jwt.sign({ phonenumber: user.phonenumber, userId: user._id }, secret);
             res.status(201).json({
                 message: "User created!",

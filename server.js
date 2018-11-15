@@ -1,6 +1,8 @@
 const http = require('http');
 const debug = require('debug');
+const socket = require('socket.io');
 const app = require('./backend/app');
+const User = require('./backend/models/user');
 
 const normalizePort = val => {
     var port = parseInt(val, 10);
@@ -46,11 +48,68 @@ const onListening = () => {
     debug("Listening on " + bind);
 };
 
-
 const port = normalizePort(process.env.PORT || "8080");
 app.set('port', port)
 
 const server = http.createServer(app);
 server.on('error', onError);
 server.on('listening', onListening);
+
+// socket io
+const io = socket(server);
 server.listen(port);
+
+io.sockets.on('connection', (socket) => {
+
+    socket.on('disconnect', (something) => {
+        console.log('user disconnected', something);
+
+    });
+
+    socket.on('join', (data) => {
+        const circle_id = data.circle_id;
+        const sender_id = data.sender_id
+
+        socket.join(circle_id, () => {
+            console.log("JOINED: ", data);
+        });
+
+    });
+
+    socket.on('leave', (data) => {
+        const circle_id = data.circle_id;
+        const sender_id = data.sender_id
+
+        socket.leave(circle_id, () => {
+            console.log("User left: ", sender_id);
+        });
+    });
+
+    socket.on('message', (data) => {
+        io.in(data.circle_id).emit('new-message', { from: data.sender_id, message: data.message });
+    });
+
+    socket.on('update-location', (data) => {
+        const sender_id = data.sender_id;
+        const circles = data.circles; // array of circles id
+        const location = data.location;
+
+        console.log(data);
+
+        // update user's lastest location in db
+        User.updateOne({ _id: sender_id },
+            { lastest_location: location })
+            .then(result => {
+                // console.log(result);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+
+        // emit event to all the circle rooms
+        circles.forEach(element => {
+            io.in(element).emit('new-location', { from: data.sender_id, location: location });
+        });
+    });
+
+});

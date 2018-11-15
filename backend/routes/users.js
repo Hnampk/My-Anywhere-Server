@@ -130,7 +130,8 @@ router.post("/sign_up", (req, res, next) => {
         name: req.body.phonenumber,
         avatar: "https://scontent.fhan3-1.fna.fbcdn.net/v/t1.0-9/43096004_2100121983332304_5007236297182412800_o.jpg?_nc_cat=102&_nc_ht=scontent.fhan3-1.fna&oh=4deebc1b11640aa8462a8e5f1c01f945&oe=5C71603B",
         address: null,
-        static_code: null
+        static_code: null,
+        lastest_location: null
     });
     user.static_code = user._id.toString().toLowerCase().split("").reverse().join("").substring(0, 5);
 

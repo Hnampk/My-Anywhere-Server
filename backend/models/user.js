@@ -10,7 +10,10 @@ const userSchema = mongoose.Schema({
         type: { lat: Number, lng: Number, content: String },
         // default: {lat: 0, lng: 0, content: ""}
     },
-    static_code: {type: String, required: true}
+    static_code: {type: String, required: true},
+    lastest_location: {
+        type: {lat: Number, lng: Number, address: String, time: Number}
+    }
 });
 
 // throw an Error when the phonenumber already exist

@@ -47,7 +47,8 @@ router.get("/:id",
                         address: result.address,
                         name: result.name,
                         avatar: result.avatar,
-                        static_code: result.static_code
+                        static_code: result.static_code,
+                        lastest_location: result.lastest_location
                     }
                 });
             })

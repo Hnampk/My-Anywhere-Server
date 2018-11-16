@@ -72,6 +72,11 @@ io.sockets.on('connection', (socket) => {
 
         socket.join(circle_id, () => {
             console.log("JOINED: ", data);
+
+            io.in(circle_id).clients((error, client)=>{
+
+                console.log(error, client);
+            })
         });
 
     });
@@ -108,7 +113,7 @@ io.sockets.on('connection', (socket) => {
 
         // emit event to all the circle rooms
         circles.forEach(element => {
-            io.in(element).emit('new-location', { from: data.sender_id, location: location });
+            io.in(element).emit('new-location', { from: data.sender_id, location: location, circle_id: element });
         });
     });
 

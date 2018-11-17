@@ -103,4 +103,62 @@ router.patch("/add_member/:circle_id", (req, res, next) => {
         });
 });
 
+/**
+ * REMOVE MEMBER FROM CIRCLE
+ * id: Circle Id
+ */
+router.patch("/remove_member/:circle_id", (req, res, next) => {
+    const circle_id = req.params.circle_id;
+    const member_id = req.body.member_id;
+
+    Circle.findOneAndUpdate({ "_id": circle_id},
+        { $pullAll: { members: [member_id] } },
+        { new: true })
+        .then(result => {
+            res.status(201).json({
+                message: "Update succesfully!",
+                result: result
+            });
+
+            // if (!result) {
+            //     Circle.findById(circle_id)
+            //         .then(result => {
+            //             res.status(201).json({
+            //                 message: "Add member successfully!",
+            //                 result: result
+            //             });
+            //         });
+            // }
+            // else {
+            //     res.status(201).json({
+            //         message: "Add member successfully!",
+            //         result: result
+            //     });
+            // }
+        })
+        .catch(error => {
+            console.log("something went wrong!!!")
+            res.status(500).json({
+                error: error
+            });
+        });
+});
+
+router.patch("/make_admin/:circle_id", (req, res, next) => {
+    const circle_id = req.params.circle_id;
+    const member_id = req.body.member_id;
+
+    Circle.updateOne({ "_id": circle_id }, { "admin_id": member_id })
+        .then(result => {
+            res.status(201).json({
+                message: "Update succesfully!"
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                error: error
+            });
+        })
+});
+
 module.exports = router;

@@ -42,12 +42,12 @@ router.get("/:id",
                 res.status(200).json({
                     message: "User fetch successfully",
                     user: {
-                        id: result._id,
+                        _id: result._id,
                         phonenumber: result.phonenumber,
                         address: result.address,
                         name: result.name,
                         avatar: result.avatar,
-                        static_code: result.static_code,
+                        // static_code: result.static_code,
                         lastest_location: result.lastest_location
                     }
                 });
@@ -105,7 +105,7 @@ router.get("/by_static_code/:static_code",
 
                 res.status(200).json({
                     message: "User fetch successfully",
-                    result: result.map(user => {
+                    users: result.map(user => {
                         return {
                             _id: user._id,
                             phonenumber: user.phonenumber,
@@ -129,7 +129,7 @@ router.post("/sign_up", (req, res, next) => {
         phonenumber: req.body.phonenumber,
         password: req.body.password,
         name: req.body.phonenumber,
-        avatar: "https://scontent.fhan3-1.fna.fbcdn.net/v/t1.0-9/43096004_2100121983332304_5007236297182412800_o.jpg?_nc_cat=102&_nc_ht=scontent.fhan3-1.fna&oh=4deebc1b11640aa8462a8e5f1c01f945&oe=5C71603B",
+        avatar: "https://www.joshmorony.com/wp-content/uploads/2018/05/ionic-logo-white-200x200.png",
         address: null,
         static_code: null,
         lastest_location: null
@@ -193,19 +193,18 @@ router.patch("/update/:id",
             name: req.body.name,
         }
 
-        let imagePath = "";
+        let image_path = "";
         // modify avatar
         if (req.file) {
             const url = req.protocol + "://" + req.get("host");
-            imagePath = url + "/images/" + req.file.filename;
+            image_path = url + "/images/" + req.file.filename;
 
             reqData = {
                 name: req.body.name,
-                avatar: imagePath
+                avatar: image_path
             }
         }
-
-        if (req.body.address) {
+        else if (req.body.address) {
             reqData = {
                 address: req.body.address
             }
@@ -218,7 +217,7 @@ router.patch("/update/:id",
                 // console.log(result)
                 res.status(201).json({
                     message: "Update succesfully!",
-                    imagePath: imagePath
+                    image_path: image_path
                 });
             })
             .catch(error => {

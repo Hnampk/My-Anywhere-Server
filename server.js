@@ -63,7 +63,6 @@ io.sockets.on('connection', (socket) => {
 
     socket.on('disconnect', (something) => {
         console.log('user disconnected', something);
-
     });
 
     socket.on('join', (data) => {
@@ -73,7 +72,7 @@ io.sockets.on('connection', (socket) => {
         socket.join(circle_id, () => {
             console.log("JOINED: ", data);
 
-            io.in(circle_id).clients((error, client)=>{
+            io.in(circle_id).clients((error, client) => {
 
                 console.log(error, client);
             })
@@ -99,8 +98,6 @@ io.sockets.on('connection', (socket) => {
         const circles = data.circles; // array of circles id
         const location = data.location;
 
-        console.log(data);
-
         // update user's lastest location in db
         User.updateOne({ _id: sender_id },
             { lastest_location: location })
@@ -113,8 +110,21 @@ io.sockets.on('connection', (socket) => {
 
         // emit event to all the circle rooms
         circles.forEach(element => {
-            io.in(element).emit('new-location', { from: data.sender_id, location: location, circle_id: element });
+            io.in(element).emit('new-location', { from: sender_id, location: location, circle_id: element });
         });
     });
+});
 
+// request to help application works background
+app.use("/api/update_location", (req, res, next) => {
+    const sender_id = req.body.sender_id;
+    const circles = req.body.circles; // array of circles id
+    const location = req.body.location;
+
+    // emit event to all the circle rooms
+    circles.forEach(element => {
+        io.in(element).emit('new-location', { from: sender_id, location: location, circle_id: element });
+    });
+
+    res.status(200);
 });

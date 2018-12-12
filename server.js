@@ -74,7 +74,9 @@ io.sockets.on('connection', (socket) => {
 
             io.in(circle_id).clients((error, client) => {
 
-                console.log(error, client);
+                if(error){
+                    console.log("JOIN FAILED: ", error)
+                }
             })
         });
 
@@ -121,10 +123,23 @@ app.use("/api/update_location", (req, res, next) => {
     const circles = req.body.circles; // array of circles id
     const location = req.body.location;
 
+    console.log(new Date().getHours() + ":" + new Date().getMinutes() + ":" + new Date().getSeconds());
+
     // emit event to all the circle rooms
     circles.forEach(element => {
         io.in(element).emit('new-location', { from: sender_id, location: location, circle_id: element });
     });
 
-    res.status(200);
+    res.status(200).json({
+        message: "success"
+    });
+});
+
+
+app.use("/api/test", (req, res, next)=>{
+    console.log("/api/test", req.body.time);
+
+    res.status(200).json({
+        message: "OK"
+    })
 });

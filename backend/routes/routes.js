@@ -22,19 +22,19 @@ router.post("/create", (req, res, next) => {
 
     route.save()
         .then(result => {
-            // Circle.findOneAndUpdate({ "_id": circleId },
-            //     { $push: { routes: result } })
-            //     .then(() => {
+            Circle.findOneAndUpdate({ "_id": circleId },
+                { route: result._id } )
+                .then(() => {
                     res.status(201).json({
                         message: "Route created!",
                         route: result
                     });
-                // })
-                // .catch(error => {
-                //     res.status(500).json({
-                //         error: error
-                //     });
-                // });
+                })
+                .catch(error => {
+                    res.status(500).json({
+                        error: error
+                    });
+                });
         })
         .catch(error => {
             res.status(500).json({
@@ -59,29 +59,29 @@ router.patch("/update/:id", (req, res, next) => {
         locations: req.body.locations
     });
 
-    Route.updateOne({ "_id": req.params.id },req.body)
+    Route.updateOne({ "_id": req.params.id }, req.body)
         .then(result => {
             res.status(201).json({
                 message: "Update succesfully!",
             });
         })
-        .catch(error=>{
+        .catch(error => {
             res.status(500).json({
                 error: error
             });
         });
 });
 
-router.get("", (req, res, next)=>{
-    Route.find({"locations._id": "5be072f1082e254ce87b299e"})
-        .then(result=>{
+router.get("", (req, res, next) => {
+    Route.find({ "locations._id": "5be072f1082e254ce87b299e" })
+        .then(result => {
             console.log(result);
             res.status(200).json({
                 message: "Hello",
                 result: result
             });
         })
-        .catch(error=>{
+        .catch(error => {
             res.status(500).json({
                 error: error
             });

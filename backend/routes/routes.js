@@ -22,8 +22,8 @@ router.post("/create", (req, res, next) => {
 
     route.save()
         .then(result => {
-            Circle.findOneAndUpdate({ "_id": circleId },
-                { route: result._id } )
+            Circle.updateOne({ "_id": circleId },
+                { "route_id": result._id } )
                 .then(() => {
                     res.status(201).json({
                         message: "Route created!",

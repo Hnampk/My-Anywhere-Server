@@ -117,7 +117,10 @@ io.sockets.on('connection', (socket) => {
     });
 });
 
-// request to help application works background
+/**
+ * Update user's location
+ * Special request to help application works Background
+ */
 app.use("/api/update_location", (req, res, next) => {
     const sender_id = req.body.sender_id;
     const circles = req.body.circles; // array of circles id

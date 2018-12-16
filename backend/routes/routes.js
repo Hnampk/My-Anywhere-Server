@@ -20,11 +20,15 @@ router.post("/create", (req, res, next) => {
         locations: req.body.locations
     });
 
+    console.log(req.body);
+
     route.save()
         .then(result => {
-            Circle.updateOne({ "_id": circleId },
-                { "route_id": result._id } )
+            console.log("result", result);
+            Circle.updateOne({ "_id": req.body.circle_id },
+                { "route": route } )
                 .then(() => {
+                    console.log("OKKK")
                     res.status(201).json({
                         message: "Route created!",
                         route: result

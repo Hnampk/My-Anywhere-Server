@@ -27,6 +27,7 @@ router.post("/create", checkAuth, (req, res, next) => {
             });
         })
         .catch(error => {
+            console.log("error", error)
             res.status(500).json({
                 error: error
             });

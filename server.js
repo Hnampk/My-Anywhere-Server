@@ -59,6 +59,9 @@ server.on('listening', onListening);
 const io = socket(server);
 server.listen(port);
 
+// next line is the money
+app.set('socketio', io);
+
 io.sockets.on('connection', (socket) => {
 
     socket.on('disconnect', (something) => {
@@ -136,13 +139,4 @@ app.use("/api/update_location", (req, res, next) => {
     res.status(200).json({
         message: "success"
     });
-});
-
-
-app.use("/api/test", (req, res, next)=>{
-    console.log("/api/test", req.body.time);
-
-    res.status(200).json({
-        message: "OK"
-    })
 });

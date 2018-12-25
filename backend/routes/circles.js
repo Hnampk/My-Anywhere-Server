@@ -83,6 +83,10 @@ router.patch("/add_member/:circle_id", (req, res, next) => {
             if (!result) {
                 Circle.findById(circle_id)
                     .then(result => {
+                        // var io = req.app.get('socketio');
+                    
+                        // io.in("5be50b3696d4b56186a719fe").emit('new-location', { from: "sender_id", location: "location", circle_id: "5be50b3696d4b56186a719fe" });
+
                         res.status(201).json({
                             message: "Add member successfully!",
                             result: result

@@ -2,7 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const mongoose = require('mongoose');
-const socket = require('socket.io');
 const usersRoute = require('./routes/users');
 const circlesRoute = require('./routes/circles');
 const routesRoute = require('./routes/routes');

@@ -31,6 +31,17 @@ const storage = multer.diskStorage({
     }
 });
 
+router.get("/test/", (req, res, next) => {
+    console.log("/api/test", req.body.time);
+    var io = req.app.get('socketio');
+
+    io.in("5be50b3696d4b56186a719fe").emit('new-location', { from: "sender_id", location: "location", circle_id: "5be50b3696d4b56186a719fe" });
+
+    res.status(200).json({
+        message: "OK"
+    })
+});
+
 /**
  * Get User by Id
  */
@@ -48,7 +59,8 @@ router.get("/:id",
                         name: result.name,
                         avatar: result.avatar,
                         // static_code: result.static_code,
-                        lastest_location: result.lastest_location
+                        lastest_location: result.lastest_location,
+                        wallet_address: result.wallet_address
                     }
                 });
             })
@@ -80,7 +92,8 @@ router.get("/by_phonenumber/:phonenumber",
                         address: result.address,
                         name: result.name,
                         avatar: result.avatar,
-                        static_code: result.static_code
+                        static_code: result.static_code,
+                        wallet_address: result.wallet_address
                     }
                 });
             })
@@ -112,7 +125,8 @@ router.get("/by_static_code/:static_code",
                             name: user.name,
                             avatar: user.avatar,
                             address: user.address,
-                            static_code: user.static_code
+                            static_code: user.static_code,
+                            wallet_address: user.wallet_address
                         }
                     }),
                 });
@@ -132,7 +146,8 @@ router.post("/sign_up", (req, res, next) => {
         avatar: "https://www.joshmorony.com/wp-content/uploads/2018/05/ionic-logo-white-200x200.png",
         address: null,
         static_code: null,
-        lastest_location: null
+        lastest_location: null,
+        wallet_address: ""
     });
     user.static_code = user._id.toString().toLowerCase().split("").reverse().join("").substring(0, 5);
 
@@ -184,6 +199,27 @@ router.post("/login", (req, res, next) => {
         });
 });
 
+router.patch("/update_wallet_address/:id", (req, res, next) => {
+    let reqData = {
+        wallet_address: req.body.wallet_address
+    }
+
+    User.updateOne({ _id: req.params.id },
+        reqData,
+        { new: true })
+        .then(result => {
+            console.log(req.body.wallet_address);
+            res.status(201).json({
+                message: "Update succesfully!",
+            });
+        })
+        .catch(error => {
+            res.status(500).json({
+                error: error
+            });
+        });
+});
+
 router.patch("/update/:id",
     [checkAuth, multer({ storage: storage }).single("image")],
     (req, res, next) => {
@@ -226,5 +262,8 @@ router.patch("/update/:id",
                 });
             });
     });
+
+
+
 
 module.exports = router;

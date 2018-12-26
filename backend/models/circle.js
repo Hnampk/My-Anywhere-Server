@@ -6,7 +6,7 @@ const circleSchema = mongoose.Schema({
     name: { type: String, required: true },
     route: {
         name: { type: String },
-        circle_id: { type: String, required: true },
+        // circle_id: { type: String, required: true },
         locations: {
             type: [{
                 _address: String,

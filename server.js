@@ -77,7 +77,7 @@ io.sockets.on('connection', (socket) => {
 
             io.in(circle_id).clients((error, client) => {
 
-                if(error){
+                if (error) {
                     console.log("JOIN FAILED: ", error)
                 }
             })
@@ -130,6 +130,15 @@ app.use("/api/update_location", (req, res, next) => {
     const location = req.body.location;
 
     console.log(new Date().getHours() + ":" + new Date().getMinutes() + ":" + new Date().getSeconds());
+
+    User.updateOne({ _id: sender_id },
+        { lastest_location: location })
+        .then(result => {
+            // console.log(result);
+        })
+        .catch(error => {
+            console.log(error);
+        });
 
     // emit event to all the circle rooms
     circles.forEach(element => {
